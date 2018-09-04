@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="renderer" content="webkit">
+	<title>document</title>
+	<link rel="stylesheet" href="css/public.css" />
+</head>
+
+<body>
+	<a data-sound-src="./sound/1.wav" data-href="http://www.baidu.com" href="http://www.baidu.com">click me</a>
+
+	<script src="js/jquery.js"></script>
+	<script>
+		$(document).ready(function () {
+			var clickSound = function () {
+				that = this;
+				that.identifier = 'data-sound-src';
+				that.targetAudio = 'data-audio-';
+
+				function renderAudioElements() {
+					var elements = '';
+					$('*[data-sound-src]').each((index, val) => {
+						elements += `<audio src="${$(val).attr(that.identifier)}" class="${that.targetAudio+index}"></audio>`
+						$(val).attr('data-target-audio', '.' + that.targetAudio + index)
+					})
+					$('body').append(elements)
+				}
+
+				function bindEvent() {
+					$('body').one('click', function () {
+						$('audio').each((index, val) => {
+							$(val).attr('preload', 'auto')
+							val.load();
+							val.play();
+						})
+					})
+					$('*[data-sound-src]').on('click', function (e) {
+						e.preventDefault();
+						var href = $(this).attr('data-href')
+						if(!!href){
+							// $(this).off('click');
+							setTimeout(() => {
+								window.location.href=href
+							}, 1000);
+						}
+						var target = $(this).attr('data-target-audio');
+						document.querySelector(target).play();
+					})
+				}
+
+				~(function init() {
+					renderAudioElements();
+					bindEvent();
+				})()
+			}
+			new clickSound();
+
+		})
+	</script>
+</body>
+
+</html>
